@@ -1,54 +1,51 @@
-import React, { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import PT from 'prop-types';
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import PT from 'prop-types'
 
-export default function Articles({
-  articles,
-  getArticles,
-  deleteArticle,
-  setCurrentArticleId,
-  currentArticleId,
-}) {
+export default function Articles(props) {
+  const { articles, getArticles, setCurrentArticleId, deleteArticle } = props
+  const navigate = useNavigate()
+
   if (!localStorage.getItem('token')) {
-    return <Navigate to="/login" />;
+    navigate('/')
   }
 
   useEffect(() => {
-    getArticles();
-  }, [getArticles]);
+
+    getArticles()
+
+  }, [])
+
+  const editArticle = (article_id) => {
+    setCurrentArticleId(article_id)
+  }
 
   return (
     <div className="articles">
       <h2>Articles</h2>
-      {articles.length === 0 ? (
-        'No articles yet'
-      ) : (
-        articles.map((art) => (
-          <div className="article" key={art.article_id}>
-            <div>
-              <h3>{art.title}</h3>
-              <p>{art.text}</p>
-              <p>Topic: {art.topic}</p>
-            </div>
-            <div>
-              <button
-                disabled={currentArticleId !== null} // Disable if there's an ongoing edit
-                onClick={() => setCurrentArticleId(art.article_id)}
-              >
-                Edit
-              </button>
-              <button
-                disabled={currentArticleId !== null} // Disable if there's an ongoing edit
-                onClick={() => deleteArticle(art.article_id)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))
-      )}
+      {
+        !articles.length
+          ? 'No articles yet'
+          : articles.map(art => {
+            return (
+              <div className="article" key={art.article_id}>
+                <div>
+                  <h3>{art.title}</h3>
+                  <p>{art.text}</p>
+                  <p>Topic: {art.topic}</p>
+                </div>
+                <div>
+                  <button onClick={() => editArticle(art.article_id)}>Edit</button>
+                  <button onClick={() => deleteArticle(art.article_id)}>Delete</button>
+                  {/* <button disabled={true} onClick={() => editArticle(art.article_id)}>Edit</button>
+                  <button disabled={true} onClick={() => deleteArticle(art.article_id)}>Delete</button> */}
+                </div>
+              </div>
+            )
+          })
+      }
     </div>
-  );
+  )
 }
 
 // 🔥 No touchy: Articles expects the following props exactly:

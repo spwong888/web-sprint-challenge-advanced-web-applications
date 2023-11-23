@@ -1,51 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import PT from 'prop-types';
+import React, { useEffect, useState } from 'react'
+import PT from 'prop-types'
+// import axiosWithAuth from '../axios'
 
-const initialFormValues = { title: '', text: '', topic: '' };
+const initialFormValues = { title: '', text: '', topic: '' }
 
-export default function ArticleForm({
-  postArticle,
-  updateArticle,
-  setCurrentArticleId,
-  currentArticle,
-}) {
-  const [values, setValues] = useState(initialFormValues);
+export default function ArticleForm(props) {
+  const { currentArticle, postArticle, updateArticle, setCurrentArticleId } = props
+  const [values, setValues] = useState(initialFormValues)
+  // console.log(currentArticle)
+  // ✨ where are my props? Destructure them here
 
   useEffect(() => {
     if (currentArticle) {
-      setValues({
-        title: currentArticle.title,
-        text: currentArticle.text,
-        topic: currentArticle.topic,
-      });
-    } else {
-      setValues(initialFormValues);
+      setValues(currentArticle)
     }
-  }, [currentArticle]);
+  }, [currentArticle])
 
-  const onChange = (evt) => {
-    const { id, value } = evt.target;
-    setValues({ ...values, [id]: value });
-  };
+  const onChange = evt => {
+    const { id, value } = evt.target
+    setValues({ ...values, [id]: value })
+  }
 
-  const onSubmit = (evt) => {
-    evt.preventDefault();
+  const onSubmit = evt => {
+    evt.preventDefault()
+    setValues(initialFormValues)
     if (currentArticle) {
-      updateArticle(currentArticle.article_id, values);
+      updateArticle({ article_id: currentArticle.article_id, article: values });
     } else {
       postArticle(values);
     }
-    setValues(initialFormValues);
-    setCurrentArticleId(null);
-  };
+  }
 
   const isDisabled = () => {
-    return Object.values(values).some((value) => value.trim() === '');
-  };
+    if (values.title && values.text && values.topic) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  const cancelEdit = () => {
+    setCurrentArticleId()
+  }
+
 
   return (
     <form id="form" onSubmit={onSubmit}>
-      <h2>{currentArticle ? 'Edit Article' : 'Create Article'}</h2>
+      <h2>{currentArticle ? 'Edit' : 'Create'} Article</h2>
       <input
         maxLength={50}
         onChange={onChange}
@@ -67,13 +67,11 @@ export default function ArticleForm({
         <option value="Node">Node</option>
       </select>
       <div className="button-group">
-        <button disabled={isDisabled()} id="submitArticle">
-          Submit
-        </button>
-        <button onClick={() => setCurrentArticleId(null)}>Cancel edit</button>
+        <button disabled={isDisabled()} id="submitArticle">Submit</button>
+        <button onClick={cancelEdit}>Cancel edit</button>
       </div>
     </form>
-  );
+  )
 }
 
 // 🔥 No touchy: LoginForm expects the following props exactly:
